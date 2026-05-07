@@ -425,7 +425,7 @@
 
         const ScreenFlashWords = ({ nikkudLevel }) => {
             const [gameDuration, setGameDuration] = useState(60); 
-            const [wordSpeed, setWordSpeed] = useState(1); // Default to 'normal' speed (1 second)
+            const [wordSpeed, setWordSpeed] = useState(1);
             const [timeLeft, setTimeLeft] = useState(0);
             const [isPlaying, setIsPlaying] = useState(false);
             const [stage, setStage] = useState('flash'); 
@@ -644,7 +644,7 @@
 
             useEffect(() => {
                 const handleKeyDown = (e) => {
-                    if (timerOn && !done && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                    if (timerOn && !done && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
                         e.preventDefault(); 
                         const allWordIds = [];
                         parasToRender.forEach((p) => {
@@ -656,7 +656,10 @@
                         if (!activeWordId) { setActiveWordId(allWordIds[0]); } else {
                             const currentIndex = allWordIds.indexOf(activeWordId);
                             if (currentIndex !== -1) {
-                                let nextIndex = e.key === 'ArrowLeft' ? currentIndex + 1 : currentIndex - 1;
+                                let nextIndex = currentIndex;
+                                if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') nextIndex = currentIndex + 1;
+                                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') nextIndex = currentIndex - 1;
+                                
                                 if (nextIndex >= allWordIds.length) nextIndex = currentIndex;
                                 if (nextIndex < 0) nextIndex = 0;
                                 setActiveWordId(allWordIds[nextIndex]);
@@ -737,7 +740,8 @@
                         <span key={i} id={`word-${wordId}`} 
                             onClick={() => handleWordClickFluency(wordId)} 
                             onMouseEnter={() => { if(timerOn) setActiveWordId(wordId) }}
-                            className={`inline-block mx-1 cursor-pointer rounded px-1 transition-all duration-100 ${isActive ? 'shadow-md border-b-[3px] border-primary' : 'hover:bg-amber-100 border-b-[3px] border-transparent'}`}
+                            onMouseLeave={() => { if(timerOn && activeWordId === wordId) setActiveWordId(null) }}
+                            className={`inline-block mx-1 cursor-pointer rounded px-1 pb-1.5 ${isActive ? 'shadow-md border-b-[3px] border-primary' : 'hover:bg-amber-100 border-b-[3px] border-transparent'}`}
                             style={{ backgroundColor: bgColor }}
                         >{w}</span>
                     );
@@ -763,7 +767,7 @@
                     </div>
                     {!done && (
                         <div className="bg-amber-50 text-amber-800 text-sm p-2 text-center rounded-lg mb-4 shadow-sm border border-amber-200">
-                            <i className="fa-solid fa-lightbulb text-primary mr-1"></i> {formatText("טִיפ: הִשְׁתַּמְּשׁוּ בָּעַכְבָּר לְסִימּוּן מִילִּים, אוֹ בַּחִצִּים יָמִינָה/שְׂמֹאלָה לְהֶמְשֵׁךְ קְרִיאָה.", nikkudLevel)}
+                            <i className="fa-solid fa-lightbulb text-primary mr-1"></i> {formatText("טִיפ: הִשְׁתַּמְּשׁוּ בָּעַכְבָּר לְסִימּוּן מִילִּים, אוֹ בַּחִצִּים לְהֶמְשֵׁךְ קְרִיאָה.", nikkudLevel)}
                         </div>
                     )}
                     <div className="mb-6 flex flex-wrap justify-center items-center gap-4 relative z-10">
